@@ -22,6 +22,7 @@
   </licenses>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <uber.jar.name>influxdb-java-2.9-deps.jar</uber.jar.name>
   </properties>
 
   <scm>
@@ -305,7 +306,7 @@
           <plugin>
             <groupId>com.dkanejs.maven.plugins</groupId>
             <artifactId>docker-compose-maven-plugin</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.1</version>
             <executions>
               <execution>
                 <id>up</id>
@@ -342,6 +343,60 @@
                 <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.1.1</version>
+            <configuration>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <outputFile>target/${uber.jar.name}</outputFile>
+              <artifactSet>
+                <includes>
+                  <include>*:*</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <relocations>
+                <relocation>
+                  <pattern>com.squareup.</pattern>
+                  <shadedPattern>org.influxdb.com.squareup</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>okio.</pattern>
+                  <shadedPattern>org.influxdb.okio</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>okhttp3.</pattern>
+                  <shadedPattern>org.influxdb.okhttp3</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>retrofit2.</pattern>
+                  <shadedPattern>org.influxdb.retrofit2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>retrofit2.</pattern>
+                  <shadedPattern>org.influxdb.retrofit2</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
                 </goals>
               </execution>
             </executions>
